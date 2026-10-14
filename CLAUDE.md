@@ -41,10 +41,12 @@ peer dependencies or files), finish the task by bumping
 3. Bump once per release. If `staging` is already ahead of npm, raise it only
    when the new work needs a bigger bump than the one already made, measured
    from the released version.
-4. Run `npm version <patch|minor|major> --no-git-tag-version` in
-   `packages/sileo-native` (the release workflow creates the tag), commit it on
-   its own as `chore(release): X.Y.Z`, and say in your summary that the next
-   merge to `main` publishes it.
+4. In `packages/sileo-native`, run
+   `npm version <patch|minor|major> --no-git-tag-version --workspaces-update=false`
+   (the release workflow creates the tag; without the last flag npm fails on
+   yarn's `workspace:` versions after bumping). Commit it on its own as
+   `chore(release): X.Y.Z`, and say in your summary that the next merge to
+   `main` publishes it.
 
 No bump for changes that don't ship: the docs site, the example app, tests, CI,
 and repo docs.
