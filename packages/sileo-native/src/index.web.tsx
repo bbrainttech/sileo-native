@@ -54,7 +54,8 @@ const toWebPromise = <T,>(opts: SileoPromiseOptions<T>) => ({
       : typeof opts.action === 'function'
         ? (data: T) => toWeb((opts.action as (d: T) => SileoOptions)(data))
         : toWeb(opts.action),
-  position: opts.position,
+  /* sileo drops the loading toast's own position; native keeps it */
+  position: opts.position ?? opts.loading.position,
 });
 
 export const sileo = {
