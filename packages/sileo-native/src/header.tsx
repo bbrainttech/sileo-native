@@ -1,13 +1,23 @@
 import {
   cloneElement,
+  type ComponentRef,
   isValidElement,
   memo,
   type ReactElement,
   type ReactNode,
   useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
 } from 'react';
 import { type LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
-import Animated, { Easing, Keyframe } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import {
   BADGE_SIZE,
   DURATION_MS,
@@ -15,6 +25,7 @@ import {
   HEADER_PADDING,
 } from './constants';
 import { ArrowRight, Check, CircleAlert, LifeBuoy, Spinner, X } from './icons';
+import { layoutSize } from './measure';
 import type { SileoState, SileoStyles } from './types';
 
 const STATE_ICON: Record<SileoState, (color: string) => ReactNode> = {
@@ -49,30 +60,19 @@ const renderIcon = (
 };
 
 /*
- * `sileo-header-enter` / `sileo-header-exit`. The web layers also blur by 6px
- * on the way in and out; a view cannot be blurred on iOS, so this trades the
- * blur for a slight scale.
+ * `sileo-header-enter` / `sileo-header-exit`, ported as the web build does
+ * it: the new row and the outgoing one are both on screen while they cross.
+ * The web rows also blur by 6px; a view cannot be blurred on iOS, so this
+ * trades the blur for a slight scale.
+ *
+ * Plain shared values rather than Reanimated's layout animations, which on
+ * the web pin the row to the size it had when the animation started — and a
+ * row that started inside the scaled-down header stays squeezed.
  */
-const HeaderEnter = new Keyframe({
-  0: { opacity: 0, transform: [{ scale: 0.96 }] },
-  100: {
-    opacity: 1,
-    transform: [{ scale: 1 }],
-    easing: Easing.out(Easing.cubic),
-  },
-}).duration(DURATION_MS);
+const EASE_OUT = Easing.out(Easing.cubic);
+const EASE = Easing.bezier(0.25, 0.1, 0.25, 1);
 
-const HeaderExit = new Keyframe({
-  0: { opacity: 1, transform: [{ scale: 1 }] },
-  100: {
-    opacity: 0,
-    transform: [{ scale: 0.96 }],
-    easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-  },
-}).duration(HEADER_EXIT_MS);
-
-interface HeaderProps {
-  layerKey: string;
+interface LayerData {
   state: SileoState;
   title?: string;
   icon?: ReactNode | null;
@@ -81,58 +81,110 @@ interface HeaderProps {
   titleColor: string;
   badgeBackground: string;
   fontFamily?: string;
+}
+
+const HeaderLayer = memo(function HeaderLayer({
+  data,
+  leaving = false,
+  onMeasure,
+}: {
+  data: LayerData;
+  leaving?: boolean;
+  onMeasure?: (width: number) => void;
+}) {
+  const ref = useRef<ComponentRef<typeof View>>(null);
+  const progress = useSharedValue(leaving ? 1 : 0);
+
+  useEffect(() => {
+    progress.value = leaving
+      ? withTiming(0, { duration: HEADER_EXIT_MS, easing: EASE })
+      : withTiming(1, { duration: DURATION_MS, easing: EASE_OUT });
+  }, [leaving, progress]);
+
+  const style = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ scale: 0.96 + 0.04 * progress.value }],
+  }));
+
+  const handleLayout = useCallback(
+    (e: LayoutChangeEvent) => onMeasure?.(layoutSize(e, ref.current).width),
+    [onMeasure]
+  );
+
+  const { state, title, icon, styles, tone, titleColor, badgeBackground } =
+    data;
+
+  return (
+    <Animated.View
+      ref={ref}
+      onLayout={onMeasure ? handleLayout : undefined}
+      pointerEvents="none"
+      style={[s.inner, leaving && s.leaving, style]}
+    >
+      <View
+        style={[s.badge, { backgroundColor: badgeBackground }, styles?.badge]}
+      >
+        {renderIcon(icon, state, tone)}
+      </View>
+      <Text
+        numberOfLines={1}
+        style={[
+          s.title,
+          { color: titleColor, fontFamily: data.fontFamily },
+          styles?.title,
+        ]}
+      >
+        {title}
+      </Text>
+    </Animated.View>
+  );
+});
+
+interface HeaderProps extends LayerData {
+  layerKey: string;
   width: number;
   onMeasure: (width: number) => void;
 }
 
 export const Header = memo(function Header({
   layerKey,
-  state,
-  title,
-  icon,
-  styles,
-  tone,
-  titleColor,
-  badgeBackground,
-  fontFamily,
   width,
   onMeasure,
+  ...data
 }: HeaderProps) {
-  const handleLayout = useCallback(
-    (e: LayoutChangeEvent) => onMeasure(e.nativeEvent.layout.width),
-    [onMeasure]
+  /* the row on its way out, kept for as long as its exit runs */
+  const [prev, setPrev] = useState<{ key: string; data: LayerData } | null>(
+    null
   );
+  const lastRef = useRef({ key: layerKey, data });
+
+  /* runs first: lastRef still holds the row from the previous commit */
+  useLayoutEffect(() => {
+    if (lastRef.current.key !== layerKey) setPrev(lastRef.current);
+  }, [layerKey]);
+
+  useLayoutEffect(() => {
+    lastRef.current = { key: layerKey, data };
+  });
+
+  useEffect(() => {
+    if (!prev) return;
+    const timer = setTimeout(() => setPrev(null), HEADER_EXIT_MS);
+    return () => clearTimeout(timer);
+  }, [prev]);
 
   /*
-   * The row sits in a holder as wide as the toast so it is measured at its
-   * natural width. The header around it is clipped to the pill, and measuring
-   * inside that clip would read back the pill's width rather than the
-   * content's — the `scrollWidth` the web build reads.
-   *
-   * Keying the row by state and title replaces the web `prev` layer: the old
-   * row plays its exit while the new one plays its entrance.
+   * The rows sit in a holder as wide as the toast so the current one is
+   * measured at its natural width. The header around it is clipped to the
+   * pill, and measuring inside that clip would read back the pill's width
+   * rather than the content's — the `scrollWidth` the web build reads.
    */
   return (
     <View style={[s.holder, { width }]}>
-      <Animated.View
-        key={layerKey}
-        entering={HeaderEnter}
-        exiting={HeaderExit}
-        onLayout={handleLayout}
-        style={s.inner}
-      >
-        <View
-          style={[s.badge, { backgroundColor: badgeBackground }, styles?.badge]}
-        >
-          {renderIcon(icon, state, tone)}
-        </View>
-        <Text
-          numberOfLines={1}
-          style={[s.title, { color: titleColor, fontFamily }, styles?.title]}
-        >
-          {title}
-        </Text>
-      </Animated.View>
+      <HeaderLayer key={layerKey} data={data} onMeasure={onMeasure} />
+      {prev && prev.key !== layerKey && (
+        <HeaderLayer key={`prev-${prev.key}`} data={prev.data} leaving />
+      )}
     </View>
   );
 });
@@ -151,6 +203,12 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  leaving: {
+    position: 'absolute',
+    left: HEADER_PADDING,
+    top: 0,
+    bottom: 0,
   },
   badge: {
     width: BADGE_SIZE,

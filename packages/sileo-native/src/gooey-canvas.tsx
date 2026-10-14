@@ -85,7 +85,8 @@ export const GooeyCanvas = memo(function GooeyCanvas({
   return (
     <Canvas
       pointerEvents="none"
-      style={[
+      // flattened: on the web Skia hands the style to a DOM element as is
+      style={StyleSheet.flatten([
         s.canvas,
         flip ? { bottom: -margin } : { top: -margin },
         {
@@ -94,7 +95,7 @@ export const GooeyCanvas = memo(function GooeyCanvas({
           height: height + margin * 2,
           transform: flip ? [{ scaleY: -1 }] : undefined,
         },
-      ]}
+      ])}
     >
       <Group transform={[{ translateX: margin }, { translateY: margin }]}>
         {blur > 0 ? (

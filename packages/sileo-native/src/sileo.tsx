@@ -1,4 +1,5 @@
 import {
+  type ComponentRef,
   memo,
   type ReactNode,
   useCallback,
@@ -46,6 +47,7 @@ import type { GlassModule } from './glass-registry';
 import { GlassSurface } from './glass-surface';
 import { GooeyCanvas } from './gooey-canvas';
 import { Header } from './header';
+import { layoutSize } from './measure';
 import { type SileoTheme, SileoThemeContext } from './theme';
 import { ToastButton } from './toast-button';
 import type {
@@ -181,8 +183,9 @@ export const Sileo = memo(function Sileo({
     }
   }, []);
 
+  const contentRef = useRef<ComponentRef<typeof View>>(null);
   const handleContentLayout = useCallback((e: LayoutChangeEvent) => {
-    const h = Math.ceil(e.nativeEvent.layout.height);
+    const h = Math.ceil(layoutSize(e, contentRef.current).height);
     setContentHeight((prev) => (prev === h ? prev : h));
   }, []);
 
@@ -688,7 +691,11 @@ export const Sileo = memo(function Sileo({
                 contentStyle,
               ]}
             >
-              <View onLayout={handleContentLayout} style={s.description}>
+              <View
+                ref={contentRef}
+                onLayout={handleContentLayout}
+                style={s.description}
+              >
                 {typeof view.description === 'string' ? (
                   <Text
                     style={[
