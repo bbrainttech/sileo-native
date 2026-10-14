@@ -4,12 +4,21 @@
   "main": "index.js",
   "dependencies": {
     "@expo/metro-runtime": "~57.0.16",
+    "@shopify/react-native-skia": "2.6.2",
     "expo": "~57.0.28",
+    "expo-glass-effect": "~57.0.4",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
-    "react-native-web": "~0.21.0"
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-svg": "15.15.4",
+    "react-native-web": "~0.21.0",
+    "react-native-worklets": "0.10.1",
+    "sileo": "^0.1.6"
   },
   "scripts": {
     "start": "expo start",
