@@ -186,7 +186,8 @@ sileo.success({ title: 'Uploaded' });
           {
             name: 'position',
             type: 'SileoPosition',
-            children: 'Where the whole flow plays.',
+            children:
+              'Where the whole flow plays. Without it, the loading toast’s position, then the Toaster’s.',
           },
         ]}
       />
