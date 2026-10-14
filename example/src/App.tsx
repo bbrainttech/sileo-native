@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Modal,
   Platform,
@@ -14,11 +14,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { FullWindowOverlay } from 'react-native-screens';
 import {
+  createTheme,
   SILEO_POSITIONS,
   sileo,
+  themes,
   Toaster,
   type SileoAppearance,
   type SileoPosition,
+  type SileoThemeOverrides,
   type SileoThemeProp,
 } from 'sileo-native';
 import 'sileo-native/glass';
@@ -33,7 +36,7 @@ const APPEARANCES: SileoAppearance[] = ['solid', 'glass'];
 const ROUNDNESS = [0, 8, 12, 16, 20];
 
 /* a custom theme per scheme, laid over the built-in ones */
-const BRAND: SileoThemeProp = {
+const BRAND: { light: SileoThemeOverrides; dark: SileoThemeOverrides } = {
   light: {
     fill: '#2e1065',
     description: 'rgba(237, 233, 254, 0.7)',
@@ -46,6 +49,48 @@ const BRAND: SileoThemeProp = {
   },
 };
 
+/* glass tints: the theme's own, none, or a color at a chosen strength */
+type Tint =
+  'theme' | 'none' | 'frost' | 'smoke' | 'blue' | 'green' | 'purple' | 'amber';
+
+const TINTS: { key: Tint; color?: string }[] = [
+  { key: 'theme' },
+  { key: 'none' },
+  { key: 'frost', color: '#ffffff' },
+  { key: 'smoke', color: '#000000' },
+  { key: 'blue', color: '#2b7fff' },
+  { key: 'green', color: '#3ac530' },
+  { key: 'purple', color: '#7c3aed' },
+  { key: 'amber', color: '#f0b100' },
+];
+const STRENGTHS = [0.15, 0.3, 0.45, 0.6];
+
+const rgba = (hex: string, alpha: number) => {
+  const channel = (i: number) => parseInt(hex.slice(i, i + 2), 16);
+  return `rgba(${channel(1)}, ${channel(3)}, ${channel(5)}, ${alpha})`;
+};
+
+/** the selected theme with `glass.tint` laid over it, whichever theme it is */
+function buildTheme(theme: Theme, tint: string | undefined): SileoThemeProp {
+  if (tint === undefined) return theme === 'brand' ? BRAND : theme;
+  const glass: SileoThemeOverrides = { glass: { tint } };
+  switch (theme) {
+    case 'light':
+    case 'dark':
+      return createTheme(glass, themes[theme]);
+    case 'system':
+      return {
+        light: createTheme(glass, themes.light),
+        dark: createTheme(glass, themes.dark),
+      };
+    case 'brand':
+      return {
+        light: { ...BRAND.light, ...glass },
+        dark: { ...BRAND.dark, ...glass },
+      };
+  }
+}
+
 export default function App() {
   const system = useColorScheme();
   const [theme, setTheme] = useState<Theme>('light');
@@ -53,12 +98,26 @@ export default function App() {
   const [roundness, setRoundness] = useState(16);
   const [appearance, setAppearance] = useState<SileoAppearance>('solid');
   const [modal, setModal] = useState<ModalMode | null>(null);
+  const [tint, setTint] = useState<Tint>('theme');
+  const [strength, setStrength] = useState(0.3);
 
   const dark =
     theme === 'dark' ||
     ((theme === 'system' || theme === 'brand') && system === 'dark');
   const c = dark ? colors.dark : colors.light;
-  const toasterTheme: SileoThemeProp = theme === 'brand' ? BRAND : theme;
+  const tintColor = TINTS.find((t) => t.key === tint)?.color;
+  const toasterTheme = useMemo(
+    () =>
+      buildTheme(
+        theme,
+        tint === 'theme'
+          ? undefined
+          : tint === 'none'
+            ? 'transparent'
+            : tintColor && rgba(tintColor, strength)
+      ),
+    [theme, tint, tintColor, strength]
+  );
 
   const fire = (type: (typeof BUTTONS)[number]['type']) =>
     fireToast(type, { position, roundness });
@@ -69,6 +128,8 @@ export default function App() {
     setTheme,
     setRoundness,
     setAppearance,
+    setTint,
+    setStrength,
     setModal,
   });
 
@@ -122,6 +183,37 @@ export default function App() {
                 />
               ))}
             </Section>
+
+            {appearance === 'glass' && (
+              <>
+                <Section label="Glass tint" c={c}>
+                  {TINTS.map((t) => (
+                    <Chip
+                      key={t.key}
+                      label={t.key}
+                      swatch={t.color}
+                      active={tint === t.key}
+                      onPress={() => setTint(t.key)}
+                      c={c}
+                    />
+                  ))}
+                </Section>
+
+                {tintColor && (
+                  <Section label="Tint strength" c={c}>
+                    {STRENGTHS.map((a) => (
+                      <Chip
+                        key={a}
+                        label={`${Math.round(a * 100)}%`}
+                        active={strength === a}
+                        onPress={() => setStrength(a)}
+                        c={c}
+                      />
+                    ))}
+                  </Section>
+                )}
+              </>
+            )}
 
             <Section label="Roundness" c={c}>
               {ROUNDNESS.map((r) => (
@@ -235,11 +327,14 @@ function Section({
 
 function Chip({
   label,
+  swatch,
   active,
   onPress,
   c,
 }: {
   label: string;
+  /** a color dot before the label */
+  swatch?: string;
   active?: boolean;
   onPress: () => void;
   c: Palette;
@@ -253,6 +348,14 @@ function Chip({
         pressed && styles.pressed,
       ]}
     >
+      {swatch && (
+        <View
+          style={[
+            styles.swatch,
+            { backgroundColor: swatch, borderColor: c.border },
+          ]}
+        />
+      )}
       <Text style={[styles.chipText, { color: active ? c.bg : c.fg }]}>
         {label}
       </Text>
@@ -294,12 +397,21 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
   },
   chipText: { fontSize: 13, fontWeight: '500' },
+  swatch: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
   pressed: { opacity: 0.6 },
   divider: {
     borderTopWidth: 1,

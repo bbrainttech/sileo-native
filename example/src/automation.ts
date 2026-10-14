@@ -13,6 +13,18 @@ interface Controls {
   setTheme: (t: 'light' | 'dark' | 'system' | 'brand') => void;
   setRoundness: (r: number) => void;
   setAppearance: (a: SileoAppearance) => void;
+  setTint: (
+    t:
+      | 'theme'
+      | 'none'
+      | 'frost'
+      | 'smoke'
+      | 'blue'
+      | 'green'
+      | 'purple'
+      | 'amber'
+  ) => void;
+  setStrength: (a: number) => void;
   setModal: (mode: 'nested' | 'overlay' | null) => void;
 }
 
@@ -43,6 +55,12 @@ export function useAutomation(controls: Controls) {
           break;
         case 'appearance':
           c.setAppearance(arg as SileoAppearance);
+          break;
+        case 'tint':
+          c.setTint(arg as Parameters<Controls['setTint']>[0]);
+          break;
+        case 'strength':
+          c.setStrength(Number(arg));
           break;
         case 'modal':
           c.setModal(arg === 'nested' || arg === 'overlay' ? arg : null);
