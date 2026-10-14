@@ -8,6 +8,10 @@ const DESCRIPTION =
  * Self-hosted, Latin-only variable fonts: Google Sans and Google Sans Code as
  * rayanstudio ships them, and Bricolage cut to the 600–700 the site sets.
  * Google Sans and Bricolage are on every first screen, so they preload.
+ *
+ * Until they arrive, text paints in Arial resized to each font's metrics
+ * (width over the site's own text, ascent and descent), so the swap barely
+ * reflows the page and never starts from the browser's default serif.
  */
 const PRELOAD = [
   '/fonts/google-sans.woff2',
@@ -18,6 +22,8 @@ const FONTS = `
 @font-face { font-family: 'Google Sans'; src: url(/fonts/google-sans.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
 @font-face { font-family: 'Bricolage Grotesque'; src: url(/fonts/bricolage-grotesque.woff2) format('woff2'); font-weight: 600 700; font-display: swap; }
 @font-face { font-family: 'Google Sans Code'; src: url(/fonts/google-sans-code.woff2) format('woff2'); font-weight: 300 800; font-display: swap; }
+@font-face { font-family: 'Google Sans Fallback'; src: local('Arial'), local('ArialMT'); size-adjust: 100.4%; ascent-override: 96.21%; descent-override: 28.49%; line-gap-override: 0%; }
+@font-face { font-family: 'Bricolage Grotesque Fallback'; src: local('Arial Bold'), local('Arial-BoldMT'); font-weight: 600 700; size-adjust: 97.4%; ascent-override: 95.48%; descent-override: 27.72%; line-gap-override: 0%; }
 `;
 
 /*
