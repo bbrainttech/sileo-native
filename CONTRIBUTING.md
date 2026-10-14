@@ -103,3 +103,7 @@ When you're sending a pull request:
 - Review the documentation to make sure it looks good.
 - Follow the pull request template when opening a pull request.
 - For pull requests that change the API or implementation, discuss with maintainers first by opening an issue.
+
+## Branches and releases
+
+Open pull requests against `staging`. `main` holds released code: merging `staging` into `main` deploys the docs and, when the version in `packages/sileo-native/package.json` is new, publishes it to npm.
