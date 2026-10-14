@@ -5,7 +5,7 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "setup-skia-web public && expo start --web",
-    "build": "setup-skia-web public && expo export --platform web && node scripts/sitemap.mjs",
+    "build": "setup-skia-web public && EXPO_PUBLIC_GITHUB_STARS=$(node scripts/stars.mjs) expo export --platform web --clear && node scripts/sitemap.mjs",
     "serve": "npx serve dist"
   },
   "dependencies": {

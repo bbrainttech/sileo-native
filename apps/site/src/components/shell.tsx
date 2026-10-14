@@ -22,6 +22,7 @@ import {
   STUDIO,
 } from '../lib/seo';
 import { DISPLAY, FONT, MONO, useSite } from '../lib/site';
+import { formatStars, useStars } from '../lib/stars';
 import { data } from '../lib/web';
 
 export const MAX_WIDTH = 1080;
@@ -80,36 +81,54 @@ function NavLink({ href, label }: { href: '/docs' | '/play'; label: string }) {
 function IconButton({
   label,
   onPress,
-  href,
   children,
 }: {
   label: string;
-  onPress?: () => void;
-  href?: string;
+  onPress: () => void;
   children: ReactNode;
 }) {
   const { c } = useSite();
-  const body = (
-    <View
-      {...data({ pill: '', hover: '', press: '' })}
-      style={[s.iconButton, { borderColor: c.border }]}
-    >
-      {children}
-    </View>
+  return (
+    <Pressable onPress={onPress} accessibilityLabel={label}>
+      <View
+        {...data({ pill: '', hover: '', press: '' })}
+        style={[s.iconButton, { borderColor: c.border }]}
+      >
+        {children}
+      </View>
+    </Pressable>
   );
-  return href ? (
+}
+
+/** the repo, with its star count once known */
+function GitHubButton() {
+  const { c } = useSite();
+  const stars = useStars();
+  return (
     <Link
-      href={href}
+      href={GITHUB}
       target="_blank"
-      accessibilityLabel={label}
+      accessibilityLabel={stars === null ? 'GitHub' : `GitHub, ${stars} stars`}
       {...data({ hideSm: '' })}
     >
-      {body}
+      <View
+        {...data({ pill: '', hover: '', press: '' })}
+        style={[
+          s.iconButton,
+          stars !== null && s.starsButton,
+          { borderColor: c.border },
+        ]}
+      >
+        <Svg width={15} height={15} viewBox="0 0 24 24" fill={c.fg}>
+          <Path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3" />
+        </Svg>
+        {stars !== null ? (
+          <Text style={[s.starsText, { color: c.fg }]}>
+            {formatStars(stars)}
+          </Text>
+        ) : null}
+      </View>
     </Link>
-  ) : (
-    <Pressable onPress={onPress} accessibilityLabel={label}>
-      {body}
-    </Pressable>
   );
 }
 
@@ -122,11 +141,7 @@ export function Nav() {
         <View style={s.navRight}>
           <NavLink href="/docs" label="Docs" />
           <NavLink href="/play" label="Playground" />
-          <IconButton label="GitHub" href={GITHUB}>
-            <Svg width={15} height={15} viewBox="0 0 24 24" fill={c.fg}>
-              <Path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3" />
-            </Svg>
-          </IconButton>
+          <GitHubButton />
           <IconButton
             label={`Switch to ${scheme === 'dark' ? 'light' : 'dark'} mode`}
             onPress={toggleScheme}
@@ -304,6 +319,18 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 4,
+  },
+  starsButton: {
+    width: 'auto',
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 11,
+  },
+  starsText: {
+    fontFamily: FONT,
+    fontSize: 13,
+    fontWeight: '500',
+    fontVariant: ['tabular-nums'],
   },
   page: { flexGrow: 1, paddingHorizontal: 20 },
   content: { width: '100%', alignSelf: 'center' },
