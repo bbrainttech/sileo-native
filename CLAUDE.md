@@ -13,9 +13,36 @@ A toast library for React Native and Expo, ported from [sileo](https://github.co
   to production and runs `.github/workflows/release.yml`.
 - The release workflow publishes only when the version in
   `packages/sileo-native/package.json` is not on npm yet, then creates a `vX.Y.Z`
-  GitHub release. To ship the library, bump that version on `staging` first:
-  patch for fixes, minor for features. A merge without a bump ships the site only.
+  GitHub release. A merge without a version bump ships the site only.
 - Never run `npm publish` locally. CI publishes through npm trusted publishing.
+
+## Versioning
+
+Bump the version yourself; don't wait to be asked. Whenever a task changes what
+the package ships (`packages/sileo-native/src`, or its `package.json` exports,
+peer dependencies or files), finish the task by bumping
+`packages/sileo-native/package.json` on `staging`:
+
+1. Compare with what is released: `npm view sileo-native version`.
+2. Pick the bump the work since that release needs. While the version is `0.x`:
+   - **minor** (`0.1.3` → `0.2.0`) for a breaking change: a removed or renamed
+     export, prop or option, a changed default, or a raised peer dependency
+     minimum.
+   - **patch** (`0.1.3` → `0.1.4`) for everything else that ships: fixes,
+     performance, new features, props and exports.
+
+   From `1.0.0` on, use plain semver: major for breaking, minor for features,
+   patch for fixes.
+3. Bump once per release. If `staging` is already ahead of npm, raise it only
+   when the new work needs a bigger bump than the one already made, measured
+   from the released version.
+4. Run `npm version <patch|minor|major> --no-git-tag-version` in
+   `packages/sileo-native` (the release workflow creates the tag), commit it on
+   its own as `Bump version to X.Y.Z`, and say in your summary that the next
+   merge to `main` publishes it.
+
+No bump for changes that don't ship: the docs site, the example app, tests, CI,
+and repo docs.
 
 ## Commits
 
