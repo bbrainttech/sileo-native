@@ -33,6 +33,7 @@ peer dependencies or files), finish the task by bumping
 
    From `1.0.0` on, use plain semver: major for breaking, minor for features,
    patch for fixes.
+
 3. Bump once per release. If `staging` is already ahead of npm, raise it only
    when the new work needs a bigger bump than the one already made, measured
    from the released version.
