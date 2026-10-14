@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "sileo-native",
+    "slug": "sileo-native-site",
+    "scheme": "sileo-native-site",
+    "userInterfaceStyle": "automatic",
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./public/favicon.png"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
