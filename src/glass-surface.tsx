@@ -47,6 +47,8 @@ interface GlassSurfaceProps {
   flip: boolean;
   visible: boolean;
   open: boolean;
+  /** the card's height when fully open */
+  content: number;
   pillX: SharedValue<number>;
   pillW: SharedValue<number>;
   pillH: SharedValue<number>;
@@ -61,6 +63,7 @@ export const GlassSurface = memo(function GlassSurface({
   flip,
   visible,
   open,
+  content,
   pillX,
   pillW,
   pillH,
@@ -77,9 +80,29 @@ export const GlassSurface = memo(function GlassSurface({
     height: pillH.value,
   }));
 
-  const bodyStyle = useAnimatedStyle(() => ({
-    height: Math.max(0, bodyH.value),
-  }));
+  /*
+   * On the canvas the card never shows as a sliver: the blur and threshold
+   * erase anything thinner than the blur, so the card seems to grow out of
+   * the pill. Glass has no threshold, and a full-width card a few points
+   * tall shows as a bar with corners under the pill before it fills in. So
+   * the card starts as the pill's footprint and stays that wide until it is
+   * a corner radius tall, so it reads as the pill stretching down. Then it
+   * spreads to full width, reaching it a little before full height, as the
+   * goo does.
+   */
+  const bodyStyle = useAnimatedStyle(() => {
+    const h = Math.max(0, bodyH.value);
+    const grown = Math.max(0, h - roundness);
+    const spread = Math.min(
+      1,
+      (1.6 * grown) / Math.max(1, content - roundness)
+    );
+    return {
+      left: pillX.value * (1 - spread),
+      width: pillW.value + (width - pillW.value) * spread,
+      height: h,
+    };
+  });
 
   const pillEffect = {
     style: visible ? theme.style : ('none' as const),
@@ -115,8 +138,7 @@ export const GlassSurface = memo(function GlassSurface({
         colorScheme={theme.colorScheme}
         style={[
           s.shape,
-          s.body,
-          { width, borderRadius: roundness },
+          { borderRadius: roundness },
           flip ? s.aboveHeader : s.belowHeader,
           bodyStyle,
         ]}
@@ -130,7 +152,6 @@ const s = StyleSheet.create({
     position: 'absolute',
     overflow: 'hidden',
   },
-  body: { left: 0 },
   top: { top: 0 },
   bottom: { bottom: 0 },
   belowHeader: { top: HEIGHT },

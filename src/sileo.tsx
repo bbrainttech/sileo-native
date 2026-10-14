@@ -634,6 +634,7 @@ export const Sileo = memo(function Sileo({
               flip={expand === 'top'}
               visible={ready && !exiting}
               open={open}
+              content={expandedContent}
               pillX={pillXv}
               pillW={pillWv}
               pillH={pillHv}
