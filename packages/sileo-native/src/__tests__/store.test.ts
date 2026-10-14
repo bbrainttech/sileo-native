@@ -213,6 +213,30 @@ describe('promise', () => {
       position: 'bottom-right',
     });
   });
+
+  it('keeps the loading toast position when the promise has none', async () => {
+    sileo.promise(Promise.resolve(), {
+      loading: { title: 'Loading', position: 'bottom-center' },
+      success: { title: 'Done' },
+      error: { title: 'Failed' },
+    });
+    expect(store.toasts[0]!.position).toBe('bottom-center');
+    await flush();
+    expect(store.toasts[0]).toMatchObject({
+      state: 'success',
+      position: 'bottom-center',
+    });
+  });
+
+  it('puts the promise position before the loading toast position', () => {
+    sileo.promise(new Promise(() => {}), {
+      loading: { title: 'Loading', position: 'bottom-center' },
+      success: { title: 'Done' },
+      error: { title: 'Failed' },
+      position: 'top-left',
+    });
+    expect(store.toasts[0]!.position).toBe('top-left');
+  });
 });
 
 describe('subscription', () => {

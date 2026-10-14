@@ -1,6 +1,6 @@
 {
   "name": "sileo-native",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An opinionated, physics-based toast library for React Native and Expo. A native port of sileo.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",

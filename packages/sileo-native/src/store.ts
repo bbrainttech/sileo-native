@@ -222,7 +222,7 @@ export const sileo = {
       ...opts.loading,
       state: 'loading',
       duration: null,
-      position: opts.position,
+      position: opts.position ?? opts.loading.position,
     });
 
     const p = typeof promise === 'function' ? promise() : promise;
