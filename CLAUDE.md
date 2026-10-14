@@ -14,7 +14,11 @@ A toast library for React Native and Expo, ported from [sileo](https://github.co
 - The release workflow publishes only when the version in
   `packages/sileo-native/package.json` is not on npm yet, then creates a `vX.Y.Z`
   GitHub release. A merge without a version bump ships the site only.
-- Never run `npm publish` locally. CI publishes through npm trusted publishing.
+- Only the owner, `bbrainttech`, merges into `main`; GitHub rules and the
+  release workflow enforce it. Never merge or push to `main`: push to `staging`
+  and tell the owner it is ready.
+- Never run `npm publish` locally. CI publishes through npm trusted publishing,
+  from the `npm` environment only.
 
 ## Versioning
 

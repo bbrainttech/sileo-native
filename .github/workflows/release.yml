@@ -9,23 +9,22 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  # npm trusted publishing: the registry trusts this workflow, no token needed
-  id-token: write
+  contents: read
 
 jobs:
-  publish:
+  # A merge only publishes when the version is new, so merges that change
+  # only the site or the example go out without a release.
+  check:
     runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      publish: ${{ steps.version.outputs.publish }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Setup
-        uses: ./.github/actions/setup
-
-      # A merge only publishes when the version is new, so merges that
-      # change only the site or the example go out without a release.
       - name: Check version
         id: version
         working-directory: packages/sileo-native
@@ -39,25 +38,42 @@ jobs:
             echo "publish=true" >> "$GITHUB_OUTPUT"
           fi
 
+  publish:
+    needs: check
+    # Only the owner's merges publish. The `npm` environment is limited to
+    # `main`, and npm trusts this workflow only when it runs in it.
+    if: needs.check.outputs.publish == 'true' && github.actor == 'bbrainttech'
+    runs-on: ubuntu-latest
+    environment: npm
+
+    permissions:
+      contents: write
+      # npm trusted publishing: the registry trusts this workflow, no token needed
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
       - name: Run unit tests
-        if: steps.version.outputs.publish == 'true'
         run: yarn test
 
       - name: Build package
-        if: steps.version.outputs.publish == 'true'
         run: yarn build
 
       - name: Publish to npm
-        if: steps.version.outputs.publish == 'true'
         working-directory: packages/sileo-native
         run: npm publish --access public --ignore-scripts
 
       - name: Create GitHub release
-        if: steps.version.outputs.publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.check.outputs.version }}
         run: |
-          gh release create "v${{ steps.version.outputs.version }}" \
+          gh release create "v$VERSION" \
             --target "$GITHUB_SHA" \
-            --title "v${{ steps.version.outputs.version }}" \
+            --title "v$VERSION" \
             --generate-notes
