@@ -4,8 +4,21 @@ import type { PropsWithChildren } from 'react';
 const DESCRIPTION =
   'An opinionated, physics-based toast component for React Native and Expo. A native port of sileo, by rayanstudio.';
 
-const FONTS =
-  'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Google+Sans:wght@400..700&family=Google+Sans+Code:wght@400..700&display=swap';
+/*
+ * Self-hosted, Latin-only variable fonts: Google Sans and Google Sans Code as
+ * rayanstudio ships them, and Bricolage cut to the 600–700 the site sets.
+ * Google Sans and Bricolage are on every first screen, so they preload.
+ */
+const PRELOAD = [
+  '/fonts/google-sans.woff2',
+  '/fonts/bricolage-grotesque.woff2',
+];
+
+const FONTS = `
+@font-face { font-family: 'Google Sans'; src: url(/fonts/google-sans.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
+@font-face { font-family: 'Bricolage Grotesque'; src: url(/fonts/bricolage-grotesque.woff2) format('woff2'); font-weight: 600 700; font-display: swap; }
+@font-face { font-family: 'Google Sans Code'; src: url(/fonts/google-sans-code.woff2) format('woff2'); font-weight: 300 800; font-display: swap; }
+`;
 
 /*
  * rayanstudio's design system, for what React Native styles cannot say.
@@ -21,7 +34,7 @@ const FONTS =
  * and the docs sidebar and its phone tabs are picked by width in CSS so the
  * static HTML and the first client render agree.
  */
-const CSS = `
+const CSS = `${FONTS}
 :root { --radius: 0.7rem; --superellipse-curve: 1.25; }
 [data-theme='dark'] { --fg: #fafafa; --muted-fg: #a1a1a1; --primary: #2b7fff; --grid: rgba(250, 250, 250, 0.13); --hover: rgba(255, 255, 255, 0.07); }
 [data-theme='light'] { --fg: #09090b; --muted-fg: #71717b; --primary: #155dfc; --grid: rgba(9, 9, 11, 0.14); --hover: #f4f4f5; }
@@ -103,15 +116,25 @@ export default function Root({ children }: PropsWithChildren) {
         <meta property="og:description" content={DESCRIPTION} />
         <meta property="og:url" content="https://sileo.rayanstudio.dev" />
         <meta name="twitter:card" content="summary" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-        <link rel="apple-touch-icon" href="/rayanstudio.png" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        {/* rayanstudio's icons, declared as rayanstudio.dev declares them */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin=""
+          rel="icon"
+          href="/rayanstudio.png"
+          type="image/png"
+          sizes="512x512"
         />
-        <link rel="stylesheet" href={FONTS} />
+        <link rel="apple-touch-icon" href="/apple-icon.png" sizes="180x180" />
+        {PRELOAD.map((href) => (
+          <link
+            key={href}
+            rel="preload"
+            href={href}
+            as="font"
+            type="font/woff2"
+            crossOrigin=""
+          />
+        ))}
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: CSS }} />
       </head>

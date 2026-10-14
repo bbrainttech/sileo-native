@@ -6,8 +6,7 @@
     "userInterfaceStyle": "automatic",
     "web": {
       "bundler": "metro",
-      "output": "static",
-      "favicon": "./public/favicon.png"
+      "output": "static"
     },
     "plugins": ["expo-router"],
     "experiments": {

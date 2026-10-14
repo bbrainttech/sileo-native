@@ -107,6 +107,10 @@ const SWIPE_VELOCITY = 800;
 
 const NO_BUTTONS: readonly SileoButton[] = [];
 
+/** room for a few lines and a row of buttons before the canvas has to grow */
+const CANVAS_MIN = HEIGHT * 4;
+const CANVAS_STEP = HEIGHT;
+
 type AccessibilityAction = NonNullable<
   ViewProps['accessibilityActions']
 >[number];
@@ -196,13 +200,15 @@ export const Sileo = memo(function Sileo({
   /*
    * The web build marks the toast ready on the first animation frame, so the
    * first width lands without a spring. Here the first width only exists
-   * once the header has been laid out, so wait for that and then a frame.
+   * once the header has been laid out, so wait for that, and for the
+   * description so the canvas is sized for it, and then a frame.
    */
+  const measured = pillWidth > 0 && (!hasDesc || contentHeight > 0);
   useEffect(() => {
-    if (ready || pillWidth === 0) return;
+    if (ready || !measured) return;
     const raf = requestAnimationFrame(() => setReady(true));
     return () => cancelAnimationFrame(raf);
-  }, [ready, pillWidth]);
+  }, [ready, measured]);
 
   /* ----------------------------- Sync fill ---------------------------------- */
 
@@ -297,6 +303,10 @@ export const Sileo = memo(function Sileo({
       return;
     }
 
+    /* the delays run from when the toast shows, so a slow first frame cannot
+       open it before it has appeared */
+    if (!ready) return;
+
     if (autoExpandDelayMs == null && autoCollapseDelayMs == null) return;
 
     const expandDelay = autoExpandDelayMs ?? 0;
@@ -329,6 +339,7 @@ export const Sileo = memo(function Sileo({
     allowExpand,
     exiting,
     applied,
+    ready,
   ]);
 
   /* ------------------------------ Derived values ---------------------------- */
@@ -344,7 +355,21 @@ export const Sileo = memo(function Sileo({
   }
 
   const expanded = open ? rawExpanded : frozenExpandedRef.current;
-  const svgHeight = hasDesc ? Math.max(expanded, minExpanded) : HEIGHT;
+
+  /*
+   * The web resizes its SVG for free; a Skia canvas rebuilds its GPU surface,
+   * which on the web stalls the next frame. So the canvas is made once the
+   * toast is measured, at a size most toasts never outgrow, and after that
+   * only grows, a step at a time.
+   */
+  const canvasHeightRef = useRef(CANVAS_MIN);
+  const needed = hasDesc ? Math.max(rawExpanded, frozenExpandedRef.current) : 0;
+  if (needed > canvasHeightRef.current) {
+    canvasHeightRef.current = Math.ceil(needed / CANVAS_STEP) * CANVAS_STEP;
+  }
+  const svgHeight = canvasHeightRef.current;
+  const canvasMountedRef = useRef(false);
+  if (measured) canvasMountedRef.current = true;
   const expandedContent = Math.max(0, expanded - HEIGHT);
   const resolvedPillWidth = Math.min(
     Math.max(pillWidth || HEIGHT, HEIGHT),
@@ -644,19 +669,21 @@ export const Sileo = memo(function Sileo({
               bodyH={bodyHv}
             />
           ) : (
-            <GooeyCanvas
-              width={width}
-              height={svgHeight}
-              fill={view.fill}
-              roundness={resolvedRoundness}
-              blur={blur}
-              flip={expand === 'top'}
-              pillX={pillXv}
-              pillW={pillWv}
-              pillH={pillHv}
-              bodyH={bodyHv}
-              bodyO={bodyOv}
-            />
+            canvasMountedRef.current && (
+              <GooeyCanvas
+                width={width}
+                height={svgHeight}
+                fill={view.fill}
+                roundness={resolvedRoundness}
+                blur={blur}
+                flip={expand === 'top'}
+                pillX={pillXv}
+                pillW={pillWv}
+                pillH={pillHv}
+                bodyH={bodyHv}
+                bodyO={bodyOv}
+              />
+            )
           )}
 
           <Animated.View

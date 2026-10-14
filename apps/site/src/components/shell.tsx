@@ -185,7 +185,7 @@ export function Footer() {
       </View>
       <View style={[s.bottomBar, { borderColor: c.border }]}>
         <Text style={[s.micro, { color: c.muted }]}>
-          © {new Date().getFullYear()} rayanstudio · MIT License
+          © {new Date().getFullYear()} rayan · MIT License
         </Text>
         <Text style={[s.micro, { color: c.muted }]}>
           A native port of sileo by hiaaryan

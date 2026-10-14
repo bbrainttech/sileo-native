@@ -59,6 +59,20 @@ export const GooeyCanvas = memo(function GooeyCanvas({
    * drawing is moved back by it.
    */
   const margin = Math.ceil(blur * REGION_SIGMA);
+  const canvasHeight = height + margin * 2;
+
+  /*
+   * A toast that opens upwards draws the same shapes mirrored. The mirror is
+   * part of the drawing rather than a style transform, which the web canvas
+   * would not apply.
+   */
+  const transform = flip
+    ? [
+        { translateX: margin },
+        { translateY: canvasHeight - margin },
+        { scaleY: -1 },
+      ]
+    : [{ translateX: margin }, { translateY: margin }];
 
   const shapes = (
     <>
@@ -85,19 +99,15 @@ export const GooeyCanvas = memo(function GooeyCanvas({
   return (
     <Canvas
       pointerEvents="none"
-      // flattened: on the web Skia hands the style to a DOM element as is
+      // flattened: on the web Skia hands the style to a DOM element as is,
+      // and drops the prop above, so the style says it again
       style={StyleSheet.flatten([
         s.canvas,
         flip ? { bottom: -margin } : { top: -margin },
-        {
-          left: -margin,
-          width: width + margin * 2,
-          height: height + margin * 2,
-          transform: flip ? [{ scaleY: -1 }] : undefined,
-        },
+        { left: -margin, width: width + margin * 2, height: canvasHeight },
       ])}
     >
-      <Group transform={[{ translateX: margin }, { translateY: margin }]}>
+      <Group transform={transform}>
         {blur > 0 ? (
           <>
             <Group
@@ -123,5 +133,6 @@ export const GooeyCanvas = memo(function GooeyCanvas({
 const s = StyleSheet.create({
   canvas: {
     position: 'absolute',
+    pointerEvents: 'none',
   },
 });
