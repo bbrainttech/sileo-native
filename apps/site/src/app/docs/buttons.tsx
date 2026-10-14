@@ -4,7 +4,10 @@ import { sileo } from '../../lib/sileo';
 
 export default function Buttons() {
   return (
-    <Page title="Buttons">
+    <Page
+      title="Buttons"
+      description="Add up to four buttons to a sileo-native toast. Each takes a title, an onPress handler and a variant that colors it, and can dismiss the toast."
+    >
       <H1 path="docs/buttons">Buttons</H1>
       <Lead>Up to four buttons in the card, each colored by a variant.</Lead>
 

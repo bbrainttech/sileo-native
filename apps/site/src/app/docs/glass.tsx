@@ -3,7 +3,10 @@ import { C, Code, H1, H2, Lead, List, P } from '../../components/ui';
 
 export default function Glass() {
   return (
-    <Page title="Liquid Glass">
+    <Page
+      title="Liquid Glass"
+      description="Draw sileo-native toasts in Liquid Glass on iOS 26 with expo-glass-effect. It is opt-in, for every toast or just one, and the solid toast stays the default."
+    >
       <H1 path="docs/glass">Liquid Glass</H1>
       <Lead>
         On iOS 26, toasts can be drawn in Liquid Glass. It is opt-in: the solid

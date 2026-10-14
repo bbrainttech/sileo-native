@@ -43,7 +43,7 @@ peer dependencies or files), finish the task by bumping
    from the released version.
 4. Run `npm version <patch|minor|major> --no-git-tag-version` in
    `packages/sileo-native` (the release workflow creates the tag), commit it on
-   its own as `Bump version to X.Y.Z`, and say in your summary that the next
+   its own as `chore(release): X.Y.Z`, and say in your summary that the next
    merge to `main` publishes it.
 
 No bump for changes that don't ship: the docs site, the example app, tests, CI,
@@ -51,8 +51,18 @@ and repo docs.
 
 ## Commits
 
-The repo is public. Keep commit messages to one short line ("Fix bottom toasts on
-the web"), and split work into focused commits.
+The repo is public. Split work into focused commits, each a one-line
+[Conventional Commit](https://www.conventionalcommits.org) that passes
+commitlint's conventional config: `type: subject`, with a lowercase subject and
+no period ("fix: keep bottom toasts on screen on the web").
+
+- `feat`, `fix`, `perf`, `refactor`: the library, `packages/sileo-native`. Add
+  `!` for a breaking change (`feat!: rename onPress to onAction`).
+- `docs`: the docs site (`apps/site`) and repo docs (README, CONTRIBUTING,
+  CLAUDE.md).
+- `test`: tests. `ci`: `.github`. `build`: build config and dependencies.
+- `chore`: the rest, such as the example app (`chore(example): ...`) and
+  version bumps (`chore(release): 0.1.1`).
 
 ## Before pushing
 

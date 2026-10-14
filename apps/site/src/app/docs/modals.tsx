@@ -3,7 +3,10 @@ import { C, Code, H1, H2, Lead, P } from '../../components/ui';
 
 export default function Modals() {
   return (
-    <Page title="Modals">
+    <Page
+      title="Modals"
+      description="Show toasts above React Native modals and dialogs: mount a Toaster inside the modal on iOS and Android, or use a full-window overlay on iOS."
+    >
       <H1 path="docs/modals">Modals and dialogs</H1>
       <Lead>
         A native modal is its own window above the app, so a Toaster at the root

@@ -55,9 +55,11 @@ export const palettes = {
 export type Palette = (typeof palettes)['light'];
 export type Scheme = 'light' | 'dark';
 
-export const FONT = 'Google Sans';
-export const DISPLAY = 'Bricolage Grotesque';
-export const MONO = 'Google Sans Code';
+/* each falls back to a face sized to it (see `+html.tsx`) while it loads */
+export const FONT = "'Google Sans', 'Google Sans Fallback', sans-serif";
+export const DISPLAY =
+  "'Bricolage Grotesque', 'Bricolage Grotesque Fallback', sans-serif";
+export const MONO = "'Google Sans Code', ui-monospace, Menlo, monospace";
 
 /* ---------------------------------- State --------------------------------- */
 

@@ -1,13 +1,21 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
 import type { PropsWithChildren } from 'react';
-
-const DESCRIPTION =
-  'An opinionated, physics-based toast component for React Native and Expo. A native port of sileo, by rayanstudio.';
+import {
+  OG_IMAGE,
+  serializeJsonLd,
+  SITE_NAME,
+  siteJsonLd,
+  TWITTER,
+} from '../lib/seo';
 
 /*
  * Self-hosted, Latin-only variable fonts: Google Sans and Google Sans Code as
  * rayanstudio ships them, and Bricolage cut to the 600–700 the site sets.
  * Google Sans and Bricolage are on every first screen, so they preload.
+ *
+ * Until they arrive, text paints in Arial resized to each font's metrics
+ * (width over the site's own text, ascent and descent), so the swap barely
+ * reflows the page and never starts from the browser's default serif.
  */
 const PRELOAD = [
   '/fonts/google-sans.woff2',
@@ -18,6 +26,8 @@ const FONTS = `
 @font-face { font-family: 'Google Sans'; src: url(/fonts/google-sans.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
 @font-face { font-family: 'Bricolage Grotesque'; src: url(/fonts/bricolage-grotesque.woff2) format('woff2'); font-weight: 600 700; font-display: swap; }
 @font-face { font-family: 'Google Sans Code'; src: url(/fonts/google-sans-code.woff2) format('woff2'); font-weight: 300 800; font-display: swap; }
+@font-face { font-family: 'Google Sans Fallback'; src: local('Arial'), local('ArialMT'); size-adjust: 100.4%; ascent-override: 96.21%; descent-override: 28.49%; line-gap-override: 0%; }
+@font-face { font-family: 'Bricolage Grotesque Fallback'; src: local('Arial Bold'), local('Arial-BoldMT'); font-weight: 600 700; size-adjust: 97.4%; ascent-override: 95.48%; descent-override: 27.72%; line-gap-override: 0%; }
 `;
 
 /*
@@ -110,12 +120,28 @@ export default function Root({ children }: PropsWithChildren) {
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
-        <meta name="description" content={DESCRIPTION} />
         <meta name="theme-color" content="#09090b" />
-        <meta property="og:title" content="sileo-native" />
-        <meta property="og:description" content={DESCRIPTION} />
-        <meta property="og:url" content="https://sileo.rayanstudio.dev" />
-        <meta name="twitter:card" content="summary" />
+        {/* each page adds its title, description and canonical (`Page`) */}
+        <meta
+          name="robots"
+          content="index, follow, max-image-preview:large, max-snippet:-1"
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:image" content={OG_IMAGE.url} />
+        <meta property="og:image:width" content={String(OG_IMAGE.width)} />
+        <meta property="og:image:height" content={String(OG_IMAGE.height)} />
+        <meta property="og:image:alt" content={OG_IMAGE.alt} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content={TWITTER} />
+        <meta name="twitter:creator" content={TWITTER} />
+        <meta name="twitter:image" content={OG_IMAGE.url} />
+        <meta name="twitter:image:alt" content={OG_IMAGE.alt} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(siteJsonLd) }}
+        />
         {/* rayanstudio's icons, declared as rayanstudio.dev declares them */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
