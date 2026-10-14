@@ -1,21 +1,26 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [".nvmrc", ".yarnrc.yml"],
-  "globalEnv": ["NODE_ENV"],
+  "globalDependencies": [
+    ".nvmrc",
+    ".yarnrc.yml"
+  ],
+  "globalEnv": [
+    "NODE_ENV"
+  ],
   "tasks": {
     "build:android": {
-      "env": ["ANDROID_HOME", "ORG_GRADLE_PROJECT_newArchEnabled"],
+      "env": [
+        "ANDROID_HOME",
+        "ORG_GRADLE_PROJECT_newArchEnabled"
+      ],
       "inputs": [
         "package.json",
         "android",
+        "!android/.gradle",
         "!android/build",
-        "src/*.ts",
-        "src/*.tsx",
-        "example/package.json",
-        "example/android",
-        "!example/android/.gradle",
-        "!example/android/build",
-        "!example/android/app/build"
+        "!android/app/build",
+        "$TURBO_ROOT$/packages/sileo-native/package.json",
+        "$TURBO_ROOT$/packages/sileo-native/src/**"
       ],
       "outputs": []
     },
@@ -28,14 +33,11 @@
       ],
       "inputs": [
         "package.json",
-        "*.podspec",
         "ios",
-        "src/*.ts",
-        "src/*.tsx",
-        "example/package.json",
-        "example/ios",
-        "!example/ios/build",
-        "!example/ios/Pods"
+        "!ios/build",
+        "!ios/Pods",
+        "$TURBO_ROOT$/packages/sileo-native/package.json",
+        "$TURBO_ROOT$/packages/sileo-native/src/**"
       ],
       "outputs": []
     }

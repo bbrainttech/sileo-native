@@ -1,0 +1,130 @@
+{
+  "name": "sileo-native",
+  "version": "0.1.0",
+  "description": "An opinionated, physics-based toast library for React Native and Expo. A native port of sileo.",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "sileo-native-source": {
+        "browser": "./src/index.web.tsx",
+        "default": "./src/index.tsx"
+      },
+      "types": "./lib/typescript/src/index.d.ts",
+      "browser": "./lib/module/index.web.js",
+      "default": "./lib/module/index.js"
+    },
+    "./glass": {
+      "sileo-native-source": "./src/glass.ts",
+      "types": "./lib/typescript/src/glass.d.ts",
+      "default": "./lib/module/glass.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "sideEffects": [
+    "./src/glass.ts",
+    "./lib/module/glass.js"
+  ],
+  "scripts": {
+    "clean": "del-cli lib",
+    "prepare": "bob build",
+    "typecheck": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "ios",
+    "android",
+    "toast",
+    "notification",
+    "sileo",
+    "skia",
+    "reanimated"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbrainttech/sileo-native.git"
+  },
+  "author": "bbrainttech (https://github.com/bbrainttech)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bbrainttech/sileo-native/issues"
+  },
+  "homepage": "https://sileo.rayanstudio.dev",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@shopify/react-native-skia": "2.6.2",
+    "@types/jest": "^30.0.0",
+    "del-cli": "^7.0.0",
+    "expo-glass-effect": "~57.0.4",
+    "jest": "^30.0.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-builder-bob": "^0.43.2",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
+    "react-native-worklets": "0.10.1",
+    "sileo": "^0.1.6"
+  },
+  "peerDependencies": {
+    "@shopify/react-native-skia": ">=2.6.0",
+    "expo-glass-effect": ">=57.0.0",
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": ">=2.32.0",
+    "react-native-reanimated": ">=4.5.0",
+    "react-native-safe-area-context": ">=5.0.0",
+    "react-native-svg": ">=15.0.0",
+    "react-native-worklets": ">=0.10.0",
+    "sileo": ">=0.1.6"
+  },
+  "peerDependenciesMeta": {
+    "expo-glass-effect": {
+      "optional": true
+    },
+    "sileo": {
+      "optional": true
+    }
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/lib/"
+    ]
+  }
+}
