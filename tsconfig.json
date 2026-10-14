@@ -2,7 +2,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "sileo-native": ["./src/index"]
+      "sileo-native": ["./src/index"],
+      "sileo-native/glass": ["./src/glass"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

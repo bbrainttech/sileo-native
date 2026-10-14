@@ -6,26 +6,24 @@
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
     ".": {
-      "sileo-native-source": "./src/index.tsx",
+      "sileo-native-source": {
+        "browser": "./src/index.web.tsx",
+        "default": "./src/index.tsx"
+      },
       "types": "./lib/typescript/src/index.d.ts",
+      "browser": "./lib/module/index.web.js",
       "default": "./lib/module/index.js"
+    },
+    "./glass": {
+      "sileo-native-source": "./src/glass.ts",
+      "types": "./lib/typescript/src/glass.d.ts",
+      "default": "./lib/module/glass.js"
     },
     "./package.json": "./package.json"
   },
   "files": [
     "src",
     "lib",
-    "android",
-    "ios",
-    "cpp",
-    "*.podspec",
-    "react-native.config.js",
-    "!ios/build",
-    "!android/build",
-    "!android/gradle",
-    "!android/gradlew",
-    "!android/gradlew.bat",
-    "!android/local.properties",
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
@@ -36,23 +34,30 @@
     "clean": "del-cli lib",
     "prepare": "bob build",
     "typecheck": "tsc",
-    "lint": "eslint \"**/*.{js,ts,tsx}\""
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "test": "jest"
   },
   "keywords": [
     "react-native",
+    "expo",
     "ios",
-    "android"
+    "android",
+    "toast",
+    "notification",
+    "sileo",
+    "skia",
+    "reanimated"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rayan/sileo-native.git"
+    "url": "git+https://github.com/bbrainttech/sileo-native.git"
   },
-  "author": "rayan <chiatiahnguea@gmail.com> (https://github.com/rayan)",
+  "author": "bbrainttech (https://github.com/bbrainttech)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rayan/sileo-native/issues"
+    "url": "https://github.com/bbrainttech/sileo-native/issues"
   },
-  "homepage": "https://github.com/rayan/sileo-native#readme",
+  "homepage": "https://github.com/bbrainttech/sileo-native#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -62,22 +67,41 @@
     "@eslint/js": "^9.39.5",
     "@react-native/babel-preset": "0.86.2",
     "@react-native/eslint-config": "0.86.2",
+    "@shopify/react-native-skia": "2.6.2",
+    "@types/jest": "^30.0.0",
     "@types/react": "^19.2.0",
     "del-cli": "^7.0.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-prettier": "^5.5.6",
+    "expo-glass-effect": "~57.0.4",
+    "jest": "^30.0.0",
     "prettier": "^3.9.6",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.86.3",
     "react-native-builder-bob": "^0.43.2",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
+    "react-native-worklets": "0.10.1",
+    "sileo": "^0.1.6",
     "turbo": "^2.10.8",
     "typescript": "^6.0.3"
   },
   "peerDependencies": {
+    "@shopify/react-native-skia": ">=2.6.0",
+    "expo-glass-effect": ">=57.0.0",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-gesture-handler": ">=2.32.0",
+    "react-native-reanimated": ">=4.5.0",
+    "react-native-safe-area-context": ">=5.0.0",
+    "react-native-svg": ">=15.0.0",
+    "react-native-worklets": ">=0.10.0",
+    "sileo": ">=0.1.6"
   },
   "workspaces": [
     "example"
@@ -112,8 +136,31 @@
     "type": "library",
     "languages": "js",
     "tools": [
-      "eslint"
+      "eslint",
+      "jest"
     ],
     "version": "0.63.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "sideEffects": [
+    "./src/glass.ts",
+    "./lib/module/glass.js"
+  ],
+  "peerDependenciesMeta": {
+    "expo-glass-effect": {
+      "optional": true
+    },
+    "sileo": {
+      "optional": true
+    }
   }
 }
