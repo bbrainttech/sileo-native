@@ -13,17 +13,7 @@ interface Controls {
   setTheme: (t: 'light' | 'dark' | 'system' | 'brand') => void;
   setRoundness: (r: number) => void;
   setAppearance: (a: SileoAppearance) => void;
-  setTint: (
-    t:
-      | 'theme'
-      | 'none'
-      | 'frost'
-      | 'smoke'
-      | 'blue'
-      | 'green'
-      | 'purple'
-      | 'amber'
-  ) => void;
+  setTint: (t: 'theme' | 'none' | 'frost' | 'smoke') => void;
   setStrength: (a: number) => void;
   setModal: (mode: 'nested' | 'overlay' | null) => void;
 }

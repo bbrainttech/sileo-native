@@ -35,33 +35,41 @@ const THEMES: Theme[] = ['light', 'dark', 'system', 'brand'];
 const APPEARANCES: SileoAppearance[] = ['solid', 'glass'];
 const ROUNDNESS = [0, 8, 12, 16, 20];
 
-/* a custom theme per scheme, laid over the built-in ones */
+/*
+ * The rayanstudio primary: #155dfc in light mode, and in dark mode the dark
+ * primary at 65% over the page, as rayanstudio's filled surfaces do. State
+ * colors are light shades so they read on blue.
+ */
+const ON_BLUE = {
+  success: '#86efac',
+  error: '#fecaca',
+  warning: '#fde68a',
+  info: '#bae6fd',
+  action: '#ffffff',
+  loading: '#dbeafe',
+};
+
 const BRAND: { light: SileoThemeOverrides; dark: SileoThemeOverrides } = {
   light: {
-    fill: '#2e1065',
-    description: 'rgba(237, 233, 254, 0.7)',
-    stateColors: { success: '#4ade80', action: '#c4b5fd' },
+    fill: '#155dfc',
+    description: 'rgba(255, 255, 255, 0.75)',
+    stateColors: ON_BLUE,
   },
   dark: {
-    fill: '#ede9fe',
-    description: 'rgba(46, 16, 101, 0.6)',
-    stateColors: { action: '#7c3aed' },
+    fill: '#1f56aa',
+    description: 'rgba(255, 255, 255, 0.7)',
+    stateColors: ON_BLUE,
   },
 };
 
-/* glass tints: the theme's own, none, or a color at a chosen strength */
-type Tint =
-  'theme' | 'none' | 'frost' | 'smoke' | 'blue' | 'green' | 'purple' | 'amber';
+/* glass tints: the theme's own, none, or a neutral at a chosen strength */
+type Tint = 'theme' | 'none' | 'frost' | 'smoke';
 
 const TINTS: { key: Tint; color?: string }[] = [
   { key: 'theme' },
   { key: 'none' },
   { key: 'frost', color: '#ffffff' },
   { key: 'smoke', color: '#000000' },
-  { key: 'blue', color: '#2b7fff' },
-  { key: 'green', color: '#3ac530' },
-  { key: 'purple', color: '#7c3aed' },
-  { key: 'amber', color: '#f0b100' },
 ];
 const STRENGTHS = [0.15, 0.3, 0.45, 0.6];
 
