@@ -4,7 +4,10 @@ import { sileo } from '../../lib/sileo';
 
 export default function Api() {
   return (
-    <Page title="API">
+    <Page
+      title="API"
+      description="The sileo API: success, error, warning, info, action, show and promise, plus dismiss and clear, and every option a toast takes."
+    >
       <H1 path="docs/api">API</H1>
       <Lead>
         <C>sileo</C> fires and controls toasts from anywhere. Every shortcut

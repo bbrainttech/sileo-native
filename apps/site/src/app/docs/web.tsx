@@ -3,7 +3,10 @@ import { A, C, Code, H1, H2, Lead, List, P } from '../../components/ui';
 
 export default function Web() {
   return (
-    <Page title="Web">
+    <Page
+      title="Web"
+      description="On the web, sileo-native re-exports sileo, so the same toast calls work in Expo web. What carries over from the native API, and what does not."
+    >
       <H1 path="docs/web">Web</H1>
       <Lead>
         On the web, sileo-native is sileo: the package re-exports the original,

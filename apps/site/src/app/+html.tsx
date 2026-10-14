@@ -1,8 +1,12 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
 import type { PropsWithChildren } from 'react';
-
-const DESCRIPTION =
-  'An opinionated, physics-based toast component for React Native and Expo. A native port of sileo, by rayanstudio.';
+import {
+  OG_IMAGE,
+  serializeJsonLd,
+  SITE_NAME,
+  siteJsonLd,
+  TWITTER,
+} from '../lib/seo';
 
 /*
  * Self-hosted, Latin-only variable fonts: Google Sans and Google Sans Code as
@@ -116,12 +120,28 @@ export default function Root({ children }: PropsWithChildren) {
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
-        <meta name="description" content={DESCRIPTION} />
         <meta name="theme-color" content="#09090b" />
-        <meta property="og:title" content="sileo-native" />
-        <meta property="og:description" content={DESCRIPTION} />
-        <meta property="og:url" content="https://sileo.rayanstudio.dev" />
-        <meta name="twitter:card" content="summary" />
+        {/* each page adds its title, description and canonical (`Page`) */}
+        <meta
+          name="robots"
+          content="index, follow, max-image-preview:large, max-snippet:-1"
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:image" content={OG_IMAGE.url} />
+        <meta property="og:image:width" content={String(OG_IMAGE.width)} />
+        <meta property="og:image:height" content={String(OG_IMAGE.height)} />
+        <meta property="og:image:alt" content={OG_IMAGE.alt} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content={TWITTER} />
+        <meta name="twitter:creator" content={TWITTER} />
+        <meta name="twitter:image" content={OG_IMAGE.url} />
+        <meta name="twitter:image:alt" content={OG_IMAGE.alt} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(siteJsonLd) }}
+        />
         {/* rayanstudio's icons, declared as rayanstudio.dev declares them */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link

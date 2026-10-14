@@ -4,7 +4,10 @@ import { sileo } from '../../lib/sileo';
 
 export default function Theming() {
   return (
-    <Page title="Theming">
+    <Page
+      title="Theming"
+      description="Theme sileo-native toasts: colors, corners, surface and font. Pick light, dark or system, lay your own tokens over it, or style a single toast."
+    >
       <H1 path="docs/theming">Theming</H1>
       <Lead>
         A theme sets the toast’s colors, corners, surface and font. Pick a

@@ -10,12 +10,21 @@ import {
   View,
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
+import {
+  CASE_STUDY,
+  DESCRIPTION,
+  GITHUB,
+  HOME_TITLE,
+  pageJsonLd,
+  pageUrl,
+  serializeJsonLd,
+  SILEO,
+  STUDIO,
+} from '../lib/seo';
 import { DISPLAY, FONT, MONO, useSite } from '../lib/site';
 import { data } from '../lib/web';
 
 export const MAX_WIDTH = 1080;
-export const GITHUB = 'https://github.com/bbrainttech/sileo-native';
-export const STUDIO = 'https://rayanstudio.dev';
 
 /* ---------------------------------- Logo ---------------------------------- */
 
@@ -179,7 +188,8 @@ export function Footer() {
           <FooterLink href="/docs" label="Docs" />
           <FooterLink href="/play" label="Playground" />
           <FooterLink href={GITHUB} label="GitHub" />
-          <FooterLink href="https://github.com/hiaaryan/sileo" label="sileo" />
+          <FooterLink href={SILEO} label="sileo" />
+          <FooterLink href={CASE_STUDY} label="Case study" />
           <FooterLink href={STUDIO} label="rayanstudio.dev" />
         </View>
       </View>
@@ -206,21 +216,52 @@ export function Footer() {
 
 /* ---------------------------------- Page ---------------------------------- */
 
+/** a page's title, description, canonical address and structured data */
+function PageHead({
+  title,
+  description,
+}: {
+  title?: string;
+  description: string;
+}) {
+  const pathname = usePathname();
+  const url = pageUrl(pathname);
+  const full = title ? `${title} — sileo-native` : HOME_TITLE;
+  return (
+    <Head>
+      <title>{full}</title>
+      <meta name="description" content={description} />
+      <link rel="canonical" href={url} />
+      <meta property="og:url" content={url} />
+      <meta property="og:title" content={full} />
+      <meta property="og:description" content={description} />
+      <meta name="twitter:title" content={full} />
+      <meta name="twitter:description" content={description} />
+      {title ? (
+        <script type="application/ld+json">
+          {serializeJsonLd(pageJsonLd({ pathname, title, description }))}
+        </script>
+      ) : null}
+    </Head>
+  );
+}
+
 /** a scrolling page with its own title, centred to `width` */
 export function Page({
   title,
+  description = DESCRIPTION,
   width = 768,
   children,
 }: {
   title?: string;
+  /** for search results and link previews, about 150 characters */
+  description?: string;
   width?: number;
   children: ReactNode;
 }) {
   return (
     <ScrollView contentContainerStyle={s.page}>
-      <Head>
-        <title>{title ? `${title} — sileo-native` : 'sileo-native'}</title>
-      </Head>
+      <PageHead title={title} description={description} />
       <View style={[s.content, { maxWidth: width }]}>{children}</View>
       <View style={[s.content, { maxWidth: width }]}>
         <Footer />

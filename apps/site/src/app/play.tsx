@@ -13,7 +13,10 @@ export default function Playground() {
   const [roundness, setRoundness] = useState(16);
 
   return (
-    <Page title="Playground">
+    <Page
+      title="Playground"
+      description="Try sileo-native in the browser: fire every toast type live, change the position, theme and roundness, and test buttons, promises and swipe to dismiss."
+    >
       <H1 path="playground">Playground</H1>
       <Lead>
         Pick a position, tap any type to fire it live. Tap a toast to open it,

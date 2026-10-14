@@ -4,7 +4,10 @@ import { sileo } from '../../lib/sileo';
 
 export default function GettingStarted() {
   return (
-    <Page title="Getting started">
+    <Page
+      title="Getting started"
+      description="Install sileo-native in an Expo or React Native app, add the Toaster and fire your first toast. Every peer dependency ships in Expo Go."
+    >
       <H1 path="docs">Getting started</H1>
       <Lead>
         sileo-native is the toast from sileo for React Native and Expo: the same

@@ -3,7 +3,10 @@ import { A, C, Code, H1, H2, Lead, List, P, Props } from '../../components/ui';
 
 export default function ToasterDocs() {
   return (
-    <Page title="Toaster">
+    <Page
+      title="Toaster"
+      description="The Toaster is the one component sileo-native needs. Mount it once above your app and set the position, theme, appearance, offset and toast defaults."
+    >
       <H1 path="docs/toaster">Toaster</H1>
       <Lead>
         The one component sileo-native needs. Mount it once, above the rest of
