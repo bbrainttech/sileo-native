@@ -4,6 +4,7 @@ import { LiveToaster } from '../components/live-toaster';
 import { Nav } from '../components/shell';
 import { SiteProvider, useSite } from '../lib/site';
 import { data } from '../lib/web';
+import { Analytics } from '@ultanimus/react';
 
 function Shell() {
   const { c, scheme } = useSite();
@@ -15,6 +16,7 @@ function Shell() {
       <Nav />
       <Slot />
       <LiveToaster />
+      <Analytics site="ult_ixgaho5axk" outbound downloads />
     </View>
   );
 }
