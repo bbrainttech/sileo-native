@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~57.0.16",
     "@shopify/react-native-skia": "2.6.2",
+    "@ultanimus/react": "^0.2.0",
     "expo": "~57.0.28",
     "expo-constants": "~57.0.21",
     "expo-linking": "~57.0.12",
